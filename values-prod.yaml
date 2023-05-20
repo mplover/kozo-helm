@@ -1,0 +1,37 @@
+ui:
+  image:
+    repository: docker.mplover.com/kozo/website-ui
+    pullPolicy: Always
+    tag: "latest"
+  port: 3000
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  minReplicas: 1
+  autoscaling:
+    enabled: true
+    maxReplicas: 3
+    target:
+      cpu: 80
+
+imagePullSecrets:
+  - name: docker-mplover
+
+ingress:
+  enabled: true
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+  hosts:
+    - host: kozobranding.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            name: website-ui
+            port: 3000
